@@ -1,26 +1,23 @@
-import dash
-from dash import dcc, html
-import plotly.express as px
+import streamlit as st
 import pandas as pd
+import numpy as np
 
-# Sample Data
-df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2],
-})
+st.title('Uber pickups in NYC')
 
-# Create a Dash app
-app = dash.Dash(__name__)
+DATE_COLUMN = 'date/time'
+DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
+         'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
 
-app.layout = html.Div(children=[
-    html.H1(children='My Dash App'),
+def load_data(nrows):
+    data = pd.read_csv(DATA_URL, nrows=nrows)
+    lowercase = lambda x: str(x).lower()
+    data.rename(lowercase, axis='columns', inplace=True)
+    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
+    return data
 
-    dcc.Graph(
-        id='example-graph',
-        figure=px.bar(df, x='Fruit', y='Amount', title='Fruit Amounts')
-    )
-])
-
-if __name__ == '__main__':
-    app.run_server(debug=True)
-
+# Create a text element and let the reader know the data is loading.
+data_load_state = st.text('Loading data...')
+# Load 10,000 rows of data into the dataframe.
+data = load_data(10000)
+# Notify the reader that the data was successfully loaded.
+data_load_state.text('Loading data...done!')
