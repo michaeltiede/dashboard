@@ -1,29 +1,26 @@
-import streamlit as st
+import dash
+from dash import dcc, html
+import plotly.express as px
 import pandas as pd
-import folium
-from streamlit_folium import st_folium
 
-# Sample data
-data = pd.DataFrame({
-    'City': ['Los Angeles', 'New York', 'Chicago'],
-    'Latitude': [34.0522, 40.7128, 41.8781],
-    'Longitude': [-118.2437, -74.0060, -87.6298]
+# Sample Data
+df = pd.DataFrame({
+    "Fruit": ["Apples", "Oranges", "Bananas"],
+    "Amount": [4, 1, 2],
 })
 
-# Streamlit app layout
-st.title('Simple Streamlit Dashboard')
+# Create a Dash app
+app = dash.Dash(__name__)
 
-# Display DataFrame
-st.write("### Sample Data")
-st.write(data)
+app.layout = html.Div(children=[
+    html.H1(children='My Dash App'),
 
-# Create a simple map
-st.write("### Map Visualization")
-map_ = folium.Map(location=[39.8283, -98.5795], zoom_start=4)  # Centered on the USA
+    dcc.Graph(
+        id='example-graph',
+        figure=px.bar(df, x='Fruit', y='Amount', title='Fruit Amounts')
+    )
+])
 
-# Add markers to the map
-for index, row in data.iterrows():
-    folium.Marker(location=[row['Latitude'], row['Longitude']], popup=row['City']).add_to(map_)
+if __name__ == '__main__':
+    app.run_server(debug=True)
 
-# Display the map in Streamlit
-st_folium(map_, width=700, height=500)
